@@ -7,18 +7,51 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Dependencies
+node_modules/
 
-# Editor directories and files
+# Build outputs
+dist/
+build/
+out/
+dist-ssr/
+
+# Cache
+.cache/
+.vite/
+.parcel-cache/
+.eslintcache
+.babelrc.json
+
+# Local environment
+*.local
+.env
+.env.*.local
+.env.production
+.env.development
+.env.testing
+
+# Editor files
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.code-workspace
+.history/
+.vscode-test/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# System trash
+$RECYCLE.BIN/
+.Trashes/
+*.cab
+*.msi
+*.msm
