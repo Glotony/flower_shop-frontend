@@ -11,7 +11,7 @@ export default function FlowerList({ onAddToCart }) {
   useEffect(() => {
     const fetchFlowers = async () => {
       try {
-        const data = await getFlowers();
+        const data = await getProducts();
         setFlowers(data);
       } catch (err) {
         console.error("Failed to load flowers:", err);

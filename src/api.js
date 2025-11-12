@@ -22,10 +22,11 @@ API.interceptors.request.use((config) => {
 // 🌸 FLOWERS
 // -----------------------------------------
 export const getFlowers = async () => (await API.get('/flowers')).data;
-export const getFlowerById = async (id) => (await API.get(`/flowers/${id}`)).data;
-export const addFlower = async (data) => (await API.post('/flowers', data)).data;
-export const updateFlower = async (id, data) => (await API.put(`/flowers/${id}`, data)).data;
-export const deleteFlower = async (id) => (await API.delete(`/flowers/${id}`)).data;
+export const getProducts = async () => (await API.get('/flowers')).data; // renamed to match frontend
+export const getProductById = async (id) => (await API.get(`/flowers/${id}`)).data;
+export const addProduct = async (data) => (await API.post('/flowers', data)).data;
+export const updateProduct = async (id, data) => (await API.put(`/flowers/${id}`, data)).data;
+export const deleteProduct = async (id) => (await API.delete(`/flowers/${id}`)).data;
 
 // -----------------------------------------
 // 🛒 CART
