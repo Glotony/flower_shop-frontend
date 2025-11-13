@@ -1,15 +1,19 @@
-// src/App.jsx
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import Products from './pages/Products';
 import Cart from './pages/Cart';
+import Register from './pages/register';
+import Login from './pages/Login';
+import ProtectedRoute from './components/ProtectedRoute';
 import { getCart } from './api';
 import './App.css';
 
 function App() {
   const [cart, setCart] = useState([]);
+  const [token, setToken] = useState(localStorage.getItem('token'));
 
   const fetchCart = async () => {
+    if (!token) return setCart([]);
     try {
       const data = await getCart();
       setCart(data || []);
@@ -20,7 +24,7 @@ function App() {
 
   useEffect(() => {
     fetchCart();
-  }, []);
+  }, [token]);
 
   const cartCount = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
@@ -35,13 +39,48 @@ function App() {
           <Link to="/cart" className="hover:underline">
             Cart ({cartCount})
           </Link>
+          {!token ? (
+            <>
+              <Link to="/login" className="hover:underline">
+                Login
+              </Link>
+              <Link to="/register" className="hover:underline">
+                Register
+              </Link>
+            </>
+          ) : (
+            <button
+              onClick={() => {
+                localStorage.removeItem('token');
+                setToken(null);
+              }}
+              className="hover:underline"
+            >
+              Logout
+            </button>
+          )}
         </nav>
       </header>
 
       <main className="p-6">
         <Routes>
           <Route path="/" element={<Products onAddToCart={fetchCart} />} />
-          <Route path="/cart" element={<Cart onUpdateCart={fetchCart} />} />
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <Cart onUpdateCart={fetchCart} />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/login"
+            element={token ? <Navigate to="/" /> : <Login onLogin={() => setToken(localStorage.getItem('token'))} />}
+          />
+          <Route
+            path="/register"
+            element={token ? <Navigate to="/" /> : <Register />}
+          />
         </Routes>
       </main>
     </Router>

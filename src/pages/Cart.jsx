@@ -1,46 +1,65 @@
-// src/pages/Cart.jsx
 import { useEffect, useState } from 'react';
-import { getCart, updateCartItem, removeFromCart, clearCart, placeOrder } from '../api';
+import { getCart, updateCartItem, removeFromCart, clearCart, placeOrder } from '../api.js';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 export default function Cart({ onUpdateCart }) {
   const [cart, setCart] = useState([]);
+  const [loadingItems, setLoadingItems] = useState([]); // track item-level actions
+  const [loading, setLoading] = useState(true);
 
   const fetchCartData = async () => {
+    setLoading(true);
     try {
       const data = await getCart();
       setCart(data || []);
-      if (onUpdateCart) onUpdateCart(); // update header cart count
+      if (onUpdateCart) onUpdateCart(); // update header/cart count
     } catch (err) {
       console.error('Error fetching cart:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchCartData();
-  }, [onUpdateCart]);
+  }, []);
 
-  const handleRemove = async (id) => {
+  const handleQuantityChange = async (flowerId, quantity) => {
+    if (quantity < 1 || loadingItems.includes(flowerId)) return;
+    setLoadingItems((prev) => [...prev, flowerId]);
+
     try {
-      await removeFromCart(id);
-      fetchCartData();
+      await updateCartItem(flowerId, quantity);
+      await fetchCartData();
     } catch (err) {
-      console.error('Error removing from cart:', err);
+      console.error('Error updating quantity:', err);
+    } finally {
+      setLoadingItems((prev) => prev.filter((id) => id !== flowerId));
     }
   };
 
-  const handleQuantityChange = async (id, qty) => {
-    if (qty < 1) return;
+  const handleRemove = async (flowerId) => {
+    if (loadingItems.includes(flowerId)) return;
+    setLoadingItems((prev) => [...prev, flowerId]);
+
     try {
-      await updateCartItem(id, qty);
-      fetchCartData();
+      await removeFromCart(flowerId);
+      await fetchCartData();
     } catch (err) {
-      console.error('Error updating quantity:', err);
+      console.error('Error removing item:', err);
+    } finally {
+      setLoadingItems((prev) => prev.filter((id) => id !== flowerId));
     }
   };
 
   const handleCheckout = async () => {
+    if (!cart.length) return alert('Cart is empty.');
     try {
-      await placeOrder({ items: cart });
+      const orderItems = cart.map((item) => ({
+        flowerId: item.flowerId,
+        quantity: item.quantity,
+      }));
+      await placeOrder({ items: orderItems });
       alert('Order placed successfully!');
       fetchCartData();
     } catch (err) {
@@ -49,55 +68,83 @@ export default function Cart({ onUpdateCart }) {
     }
   };
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const handleClearCart = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      await clearCart();
+      fetchCartData();
+    } catch (err) {
+      console.error('Error clearing cart:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const total = cart.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 0), 0);
+
+  if (loading) return <p className="text-center mt-10">Loading your cart...</p>;
 
   return (
-    <div className="cart-section">
-      <h2>Your Cart</h2>
-      {cart.length === 0 ? (
-        <p>Your cart is empty.</p>
-      ) : (
-        <>
-          <ul className="cart-list">
-            {cart.map((item) => (
-              <li key={item.id} className="flex justify-between items-center mb-2">
-                <span>
-                  {item.name} x{' '}
-                  <input
-                    type="number"
-                    value={item.quantity}
-                    min="1"
-                    onChange={(e) => handleQuantityChange(item.id, parseInt(e.target.value))}
-                    className="w-16 border rounded px-1"
-                  />{' '}
-                  - ${item.price * item.quantity}
-                </span>
-                <button
-                  onClick={() => handleRemove(item.id)}
-                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
+    <ProtectedRoute>
+      <div className="cart-section p-4">
+        <h2 className="text-xl font-bold mb-4">Your Cart</h2>
+
+        {cart.length === 0 ? (
+          <p>Your cart is empty.</p>
+        ) : (
+          <>
+            <ul className="cart-list mb-4">
+              {cart.map((item, idx) => (
+                <li
+                  key={`${item.flowerId}-${idx}`} // ensures uniqueness
+                  className="flex justify-between items-center mb-2"
                 >
-                  Remove
-                </button>
-              </li>
-            ))}
-          </ul>
-          <p className="font-bold mt-4">Total: ${total}</p>
-          <div className="mt-4 flex gap-2">
-            <button
-              onClick={handleCheckout}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
-            >
-              Checkout
-            </button>
-            <button
-              onClick={() => clearCart().then(fetchCartData)}
-              className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 transition"
-            >
-              Clear Cart
-            </button>
-          </div>
-        </>
-      )}
-    </div>
+                  <span>
+                    {item.name} x{' '}
+                    <input
+                      type="number"
+                      value={item.quantity}
+                      min="1"
+                      disabled={loadingItems.includes(item.flowerId)}
+                      onChange={(e) => handleQuantityChange(item.flowerId, parseInt(e.target.value))}
+                      className="w-16 border rounded px-1"
+                    />{' '}
+                    - €{((item.price || 0) * (item.quantity || 0)).toFixed(2)}
+                  </span>
+
+                  <button
+                    onClick={() => handleRemove(item.flowerId)}
+                    disabled={loadingItems.includes(item.flowerId)}
+                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
+                  >
+                    {loadingItems.includes(item.flowerId) ? '...' : 'Remove'}
+                  </button>
+                </li>
+              ))}
+
+            </ul>
+
+            <p className="font-bold mt-4">Total: €{total.toFixed(2)}</p>
+
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={handleCheckout}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
+              >
+                Checkout
+              </button>
+              <button
+                onClick={handleClearCart}
+                disabled={loading}
+                className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 transition"
+              >
+                Clear Cart
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </ProtectedRoute>
   );
 }
