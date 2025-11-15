@@ -58,7 +58,8 @@ export const placeOrderCart = async (items) =>
 // -----------------------------------------
 export const getOrders = async () => (await API.get('/orders')).data;
 export const getOrderById = async (id) => (await API.get(`/orders/${id}`)).data;
-export const placeOrder = async (order) => (await API.post('/orders', order)).data;
+export const placeOrder = async () => 
+  (await API.post('/orders')).data; // hits /api/orders
 export const cancelOrder = async (id) => (await API.delete(`/orders/${id}`)).data;
 export const updateOrderStatus = async (id, status) =>
   (await API.put(`/orders/${id}`, { status })).data;

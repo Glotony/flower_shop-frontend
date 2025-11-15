@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { getProducts, addToCart, getCart } from '../api.js';
+import { getProducts, addToCart as addToCartAPI } from '../api.js';
+import { useCart } from '../context/CartContext';
 
-export default function Products({ onUpdateCart }) {
+export default function Products() {
   const [flowers, setFlowers] = useState([]);
-  const [loadingIds, setLoadingIds] = useState([]); // tracks adding status
+  const [loadingIds, setLoadingIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const { cart, setCart } = useCart(); // use context directly
 
   // Fetch products from backend
   const fetchFlowers = async () => {
@@ -26,18 +29,32 @@ export default function Products({ onUpdateCart }) {
   }, []);
 
   // Add product to cart
-  const handleAddToCart = async (flowerId) => {
-    if (loadingIds.includes(flowerId)) return;
-    setLoadingIds((prev) => [...prev, flowerId]);
+  const handleAddToCart = async (flower) => {
+    if (loadingIds.includes(flower.id)) return;
+    setLoadingIds((prev) => [...prev, flower.id]);
 
     try {
-      await addToCart(flowerId, 1); // quantity = 1
-      if (onUpdateCart) await onUpdateCart(); // update header/cart count
+      // Optimistically update cart immediately
+      const existing = cart.find((item) => item.flowerId === flower.id);
+      if (existing) {
+        setCart(
+          cart.map((item) =>
+            item.flowerId === flower.id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          )
+        );
+      } else {
+        setCart([...cart, { flowerId: flower.id, name: flower.name, price: flower.price, quantity: 1 }]);
+      }
+
+      // Sync backend
+      await addToCartAPI(flower.id, 1);
     } catch (err) {
       console.error('Error adding to cart:', err);
       alert('Failed to add to cart.');
     } finally {
-      setLoadingIds((prev) => prev.filter((id) => id !== flowerId));
+      setLoadingIds((prev) => prev.filter((id) => id !== flower.id));
     }
   };
 
@@ -62,7 +79,7 @@ export default function Products({ onUpdateCart }) {
             <p className="text-gray-600 line-clamp-2">{flower.description}</p>
             <p className="text-green-600 font-semibold mt-2">€{flower.price.toFixed(2)}</p>
             <button
-              onClick={() => handleAddToCart(flower.id)}
+              onClick={() => handleAddToCart(flower)}
               disabled={loadingIds.includes(flower.id)}
               className={`mt-3 px-4 py-2 rounded-xl text-white ${
                 loadingIds.includes(flower.id)
