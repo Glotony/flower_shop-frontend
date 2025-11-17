@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getCart, updateCartItem, removeFromCart, clearCart, placeOrder } from '../api.js';
 import ProtectedRoute from '../components/ProtectedRoute';
+import styles from '../css/cart.module.css'; // ← use CSS module
 
 export default function Cart({ onUpdateCart }) {
   const [cart, setCart] = useState([]);
@@ -87,14 +88,14 @@ export default function Cart({ onUpdateCart }) {
 
   return (
     <ProtectedRoute>
-      <div className="cart-section p-4">
+      <div className={styles['cart-section'] + ' p-4'}>
         <h2 className="text-xl font-bold mb-4">Your Cart</h2>
 
         {cart.length === 0 ? (
           <p>Your cart is empty.</p>
         ) : (
           <>
-            <ul className="cart-list mb-4">
+            <ul className={styles['cart-list'] + ' mb-4'}>
               {cart.map((item, idx) => (
                 <li
                   key={`${item.flowerId}-${idx}`} // ensures uniqueness
@@ -107,7 +108,9 @@ export default function Cart({ onUpdateCart }) {
                       value={item.quantity}
                       min="1"
                       disabled={loadingItems.includes(item.flowerId)}
-                      onChange={(e) => handleQuantityChange(item.flowerId, parseInt(e.target.value))}
+                      onChange={(e) =>
+                        handleQuantityChange(item.flowerId, parseInt(e.target.value))
+                      }
                       className="w-16 border rounded px-1"
                     />{' '}
                     - €{((item.price || 0) * (item.quantity || 0)).toFixed(2)}
@@ -116,29 +119,21 @@ export default function Cart({ onUpdateCart }) {
                   <button
                     onClick={() => handleRemove(item.flowerId)}
                     disabled={loadingItems.includes(item.flowerId)}
-                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition"
+                    className={styles['remove-btn']}
                   >
                     {loadingItems.includes(item.flowerId) ? '...' : 'Remove'}
                   </button>
                 </li>
               ))}
-
             </ul>
 
-            <p className="font-bold mt-4">Total: €{total.toFixed(2)}</p>
+            <p className={styles['total']}>Total: €{total.toFixed(2)}</p>
 
             <div className="mt-4 flex gap-2">
-              <button
-                onClick={handleCheckout}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition"
-              >
+              <button onClick={handleCheckout} className={styles['checkout-btn']}>
                 Checkout
               </button>
-              <button
-                onClick={handleClearCart}
-                disabled={loading}
-                className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 transition"
-              >
+              <button onClick={handleClearCart} className={styles['clear-btn']} disabled={loading}>
                 Clear Cart
               </button>
             </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import styles from '../css/register.module.css'; // import your module
 
 export default function Register() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
@@ -22,15 +23,45 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-container">
-      <h2>Register</h2>
-      <form onSubmit={handleSubmit}>
-        <input name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
-        <input name="email" placeholder="Email" type="email" value={form.email} onChange={handleChange} required />
-        <input name="password" placeholder="Password" type="password" value={form.password} onChange={handleChange} required />
-        <button type="submit">Register</button>
-        {error && <p className="error">{error}</p>}
-      </form>
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>Register</h2>
+
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <input
+            name="name"
+            placeholder="Name"
+            value={form.name}
+            onChange={handleChange}
+            required
+            className={styles.input}
+          />
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className={styles.input}
+          />
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            required
+            className={styles.input}
+          />
+          <button type="submit" className={styles.button}>Register</button>
+          {error && <p className={styles.error}>{error}</p>}
+        </form>
+
+        <p className={styles.link}>
+          Already have an account? <a href="/login">Login</a>
+        </p>
+      </div>
     </div>
   );
 }

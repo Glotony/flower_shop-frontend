@@ -1,0 +1,132 @@
+/* root container: always full screen */
+.container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+  font-family: 'Inter', sans-serif;
+  overflow: hidden;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* card holding the form */
+.card {
+  width: 100%;
+  max-width: 600px;
+  background: #ffffff;
+  padding: 50px 40px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.12);
+}
+
+/* title */
+.title {
+  font-size: 36px;
+  font-weight: 800;
+  color: #111827;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/* form layout */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* inputs */
+.input {
+  padding: 16px 20px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  background: #0b3e70;
+  font-size: 16px;
+  outline: none;
+  box-shadow: inset 2px 2px 6px rgba(0,0,0,0.03);
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+  background: #000000;
+  box-shadow: 0 4px 12px rgba(59,130,246,0.15);
+}
+
+/* button */
+.button {
+  padding: 16px;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(59,130,246,0.25);
+  transition: all 0.3s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(59,130,246,0.35);
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+}
+
+/* error message */
+.error {
+  color: #ef4444;
+  font-size: 15px;
+  text-align: center;
+  margin-top: 8px;
+}
+
+/* link under form */
+.link {
+  text-align: center;
+  font-size: 15px;
+}
+
+.link a {
+  color: #3b82f6;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.link a:hover {
+  text-decoration: underline;
+  color: #1d4ed8;
+}
+
+/* responsive adjustments */
+@media (max-width: 768px) {
+  .card {
+    padding: 40px 20px;
+    border-radius: 20px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .input, .button {
+    font-size: 16px;
+    padding: 14px;
+  }
+}

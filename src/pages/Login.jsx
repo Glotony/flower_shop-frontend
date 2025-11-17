@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import styles from '../css/login.module.css'; // import as module
 
 export default function Login() {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -15,22 +16,45 @@ export default function Login() {
     e.preventDefault();
     try {
       const res = await axios.post('http://localhost:5000/api/auth/login', form);
-      localStorage.setItem('token', res.data.token); // save JWT
-      navigate('/'); // redirect after login
+      localStorage.setItem('token', res.data.token);
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     }
   };
 
   return (
-    <div className="auth-container">
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <input name="email" placeholder="Email" type="email" value={form.email} onChange={handleChange} required />
-        <input name="password" placeholder="Password" type="password" value={form.password} onChange={handleChange} required />
-        <button type="submit">Login</button>
-        {error && <p className="error">{error}</p>}
-      </form>
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>Login</h2>
+
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className={styles.input}
+          />
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            required
+            className={styles.input}
+          />
+          <button type="submit" className={styles.button}>Login</button>
+          {error && <p className={styles.error}>{error}</p>}
+        </form>
+
+        <p className={styles.link}>
+          Don’t have an account? <a href="/register">Register</a>
+        </p>
+      </div>
     </div>
   );
 }
