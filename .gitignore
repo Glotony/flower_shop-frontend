@@ -48,6 +48,7 @@ dist-ssr/
 .DS_Store
 Thumbs.db
 desktop.ini
+Task.txt
 
 # System trash
 $RECYCLE.BIN/
