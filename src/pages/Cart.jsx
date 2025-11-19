@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { getCart, updateCartItem, removeFromCart, clearCart, placeOrder } from '../api.js';
+import { getCart, updateCartItem, removeFromCart, clearCart, placeOrderCart } from '../api.js';
 import ProtectedRoute from '../components/ProtectedRoute';
-import styles from '../css/cart.module.css'; // ← use CSS module
+import styles from '../css/cart.module.css';
 
 export default function Cart({ onUpdateCart }) {
   const [cart, setCart] = useState([]);
-  const [loadingItems, setLoadingItems] = useState([]); // track item-level actions
+  const [loadingItems, setLoadingItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchCartData = async () => {
@@ -60,9 +60,9 @@ export default function Cart({ onUpdateCart }) {
         flowerId: item.flowerId,
         quantity: item.quantity,
       }));
-      await placeOrder({ items: orderItems });
+      await placeOrderCart(orderItems); // ← use cart API
       alert('Order placed successfully!');
-      fetchCartData();
+      await fetchCartData();
     } catch (err) {
       console.error('Checkout failed:', err);
       alert('Checkout failed, try again.');
@@ -74,7 +74,7 @@ export default function Cart({ onUpdateCart }) {
     setLoading(true);
     try {
       await clearCart();
-      fetchCartData();
+      await fetchCartData();
     } catch (err) {
       console.error('Error clearing cart:', err);
     } finally {
@@ -88,17 +88,17 @@ export default function Cart({ onUpdateCart }) {
 
   return (
     <ProtectedRoute>
-      <div className={styles['cart-section'] + ' p-4'}>
+      <div className={`${styles['cart-section']} p-4`}>
         <h2 className="text-xl font-bold mb-4">Your Cart</h2>
 
         {cart.length === 0 ? (
           <p>Your cart is empty.</p>
         ) : (
           <>
-            <ul className={styles['cart-list'] + ' mb-4'}>
+            <ul className={`${styles['cart-list']} mb-4`}>
               {cart.map((item, idx) => (
                 <li
-                  key={`${item.flowerId}-${idx}`} // ensures uniqueness
+                  key={`${item.flowerId}-${idx}`}
                   className="flex justify-between items-center mb-2"
                 >
                   <span>

@@ -12,6 +12,12 @@ function Header({ token, setToken }) {
   const { cart } = useCart();
   const cartCount = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+    window.location.href = '/login'; // redirect to login immediately
+  };
+
   return (
     <header className="flex justify-between items-center bg-green-600 text-white px-6 py-4 shadow">
       <h1 className="text-2xl font-bold">🌿 Plant Shop</h1>
@@ -25,10 +31,7 @@ function Header({ token, setToken }) {
           </>
         ) : (
           <button
-            onClick={() => {
-              localStorage.removeItem('token');
-              setToken(null);
-            }}
+            onClick={handleLogout}
             className="hover:underline"
           >
             Logout

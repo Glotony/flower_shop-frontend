@@ -17,6 +17,8 @@ export const CartProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return; //  <-- FIXED: do not fetch cart without token
     fetchCart();
   }, []);
 

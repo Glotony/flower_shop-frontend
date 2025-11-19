@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getProducts, addToCart as addToCartAPI } from '../api.js';
+import { getFlowers, addToCart as addToCartAPI } from '../api.js';
 import { useCart } from '../context/CartContext';
 import styles from '../css/products.module.css'; // plant-themed CSS module
 
@@ -14,7 +14,7 @@ export default function Products() {
   const fetchFlowers = async () => {
     setLoading(true);
     try {
-      const data = await getProducts();
+      const data = await getFlowers();
       setFlowers(data || []);
     } catch (err) {
       console.error('Error fetching flowers:', err);
@@ -23,6 +23,7 @@ export default function Products() {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchFlowers();
