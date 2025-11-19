@@ -1,1 +1,22 @@
-*.jsx linguist-language=React
+# React / JavaScript
+*.js linguist-language=JavaScript
+*.jsx linguist-language=JavaScript
+*.ts linguist-language=TypeScript
+*.tsx linguist-language=TypeScript
+
+# Markup & styles
+*.html linguist-language=HTML
+*.css linguist-language=CSS
+*.scss linguist-language=CSS
+
+# JSON & config
+*.json linguist-language=JSON
+*.yml linguist-language=YAML
+*.yaml linguist-language=YAML
+
+# Markdown / documentation
+*.md linguist-language=Markdown
+
+# Ignore config files from language stats
+.gitattributes linguist-vendored
+.gitignore linguist-vendored
