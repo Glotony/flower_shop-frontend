@@ -19,7 +19,6 @@ export default function Login({ onLogin }) {
 
       localStorage.setItem('token', res.data.token);
 
-      // 🔥 VERY IMPORTANT: notify App.jsx that user is logged in
       if (onLogin) onLogin();
 
       navigate('/');

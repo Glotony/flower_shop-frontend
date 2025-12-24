@@ -6,3 +6,4 @@ vite
 tailwindcss
 postcss
 autoprefixer
+@vitejs/plugin-react==4.2.0
